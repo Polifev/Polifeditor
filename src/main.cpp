@@ -11,6 +11,10 @@
 
 int main(int argc, char** argv) {
 	TextFile file = TextFile("/home/pol/test.txt");
+	file.read();
+	//file.insertLine(0);
+	//file.editLine(3, "Nouvelle ...");
+	//file.write();
 
 	initscr();
 	noecho();
@@ -24,11 +28,9 @@ int main(int argc, char** argv) {
 	bool exit = false;
 	wmove(top, 1, 1);
 
-	for(int i = 0; i < file.lineCount(); i++) {
-		waddstr(bottom, file.line(i).c_str());
-		waddch(bottom, '\n');
-	}
+	//waddstr(bottom, file.content().c_str());
 	refresh();
+	
 	while(! exit) {
 		char c = wgetch(top);
 		if(iscntrl(c)){

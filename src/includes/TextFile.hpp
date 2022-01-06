@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class TextFile {
 	public:
@@ -8,9 +9,11 @@ class TextFile {
 		void write();
 		void read();
 
-		std::string line(int line);
-		int lineCount();
+		void insertLine(int index);
+		void editLine(int index, std::string newLine);
+		std::string getLine(int index);
 	private:
-		std::string filename;
-		std::string buffer;
+		std::string _filename;
+		std::string _buffer;
+		std::vector<std::string> _lines;
 };
