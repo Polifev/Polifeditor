@@ -9,8 +9,10 @@ class TextFile {
 		void write();
 		void read();
 
+		int lineCount();
 		void insertLine(int index);
 		void editLine(int index, std::string newLine);
+		void removeLine(int index);
 		std::string getLine(int index);
 	private:
 		std::string _filename;

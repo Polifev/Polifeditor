@@ -1,51 +1,108 @@
 #include "TextFile.hpp"
+#include "Editor.hpp"
 
 #include <ncurses.h>
 #include <ctype.h>
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 
+#define NEW_LINE 10
+#define BACK_SPACE 127
 #define CTRL_KEY(key) ((key) & 0x1f)
 
+void escaped(Editor &editor, char c);
+
+//void printInConsole(WINDOW* console, std::string str);
+
+
 int main(int argc, char** argv) {
-	TextFile file = TextFile("/home/pol/test.txt");
-	file.read();
-	//file.insertLine(0);
-	//file.editLine(3, "Nouvelle ...");
-	//file.write();
-
-	initscr();
-	noecho();
-
-	WINDOW* top = subwin(stdscr, LINES / 2, COLS, 0, 0);
-	WINDOW* bottom = subwin(stdscr, LINES / 2, COLS, LINES / 2, 0);
-
-	box(top, ACS_VLINE, ACS_HLINE);
-	box(bottom, ACS_VLINE, ACS_HLINE);
+	Editor editor;
+	
+	if(argc > 1){
+		editor.openTextFile(argv[1]);
+	}
+	//editor
+	
+	editor.renderFilePortion(0);
+	editor.moveTo(0, 0);
+	//editor.moveInText(-999, -999);
 
 	bool exit = false;
-	wmove(top, 1, 1);
-
-	//waddstr(bottom, file.content().c_str());
-	refresh();
-	
+	bool escape = false;
+	bool bracket = false;
 	while(! exit) {
-		char c = wgetch(top);
-		if(iscntrl(c)){
-			std::string formatStr = "%d";
-			const char* format = formatStr.c_str();
-			char buff[16];
-			sprintf(buff, format, c);
-			exit = ( c == CTRL_KEY('a') );
-			waddstr(top, buff);
-		} else {
-			waddch(top, c);
+		char c = editor.readChar();
+
+		if(! escape && c == 27){
+			escape = true;
 		}
-		refresh();
+		else if(escape && !bracket && c == '['){
+			bracket = true;
+		}
+		else if(escape && bracket){
+			escape = false;
+			bracket = false;
+			escaped(editor, c);
+		} else if(iscntrl(c)){
+			switch (c) {
+				case CTRL_KEY('x'):
+					exit = true;
+					break;
+				case CTRL_KEY('w'):
+					editor.save();
+					break;
+				case NEW_LINE:
+					editor.insertNewLine();
+					break;
+				case BACK_SPACE:
+					editor.eraseBackward();
+				default :
+					std::ostringstream output;
+					output << (int) c;
+					editor.printToConsole(output.str());
+					break;
+			}
+		} else {
+			editor.insertChar(c);
+		}
+		editor.refresh();
 	}
 
-	endwin();
+	editor.dispose();
 	return 0;
 }
+
+void escaped(Editor& editor, char c) {
+	switch(c) {
+		case 'A':
+			// UP
+			editor.move(-1, 0);
+			break;
+		case 'B':
+			// DOWN
+			editor.move(1, 0);
+			break;
+		case 'C':
+			// RIGHT
+			editor.move(0, 1);
+			break;
+		case 'D':
+			// LEFT
+			editor.move(0, -1);
+			break;
+		default:
+			break;
+	}
+}
+
+/*
+void printInConsole(WINDOW* console, std::string str){
+	wmove(console, 0, 0);
+	waddstr(console, str.c_str());
+	wclrtoeol(console);
+	wrefresh(console);
+}
+*/

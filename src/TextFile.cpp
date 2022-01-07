@@ -33,14 +33,26 @@ void TextFile::write() {
 	outFile.close();
 }
 
+int TextFile::lineCount() {
+	return _lines.size();
+}
+
 void TextFile::insertLine(const int index){
 	std::vector<std::string>::iterator it = _lines.begin() + index;
 	_lines.insert(it, std::string(""));
 }
 
 void TextFile::editLine(int index, std::string newLine){
-	if(_lines.size() > index){
+	if(_lines.size() > index && index >= 0){
 		_lines[index] = newLine;
+	}
+	// Error
+}
+
+void TextFile::removeLine(int index){
+	if(_lines.size() > index && index >= 0){
+		std::vector<std::string>::iterator it = _lines.begin() + index;
+		_lines.erase(it);
 	}
 	// Error
 }
