@@ -1,14 +1,20 @@
 #include "TextFile.hpp"
 
+#include <locale>
+#include <codecvt>
+#include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 
 TextFile::TextFile(std::string filename) : _filename{filename} 
-{}
+{
+	_lines.push_back("");
+}
 
 void TextFile::read(){
+	_lines.clear();
 	std::ifstream inFile;
 
 	inFile.open(_filename);
@@ -26,11 +32,17 @@ void TextFile::read(){
 void TextFile::write() {
 	std::ofstream outFile;
 	outFile.open(_filename);
-
-	for(const std::string &line: _lines){
-		outFile << line << std::endl;
+	if(outFile){
+		for(const std::string &line: _lines){
+			outFile << line << std::endl;
+		}
 	}
 	outFile.close();
+}
+
+void TextFile::writeAs(std::string filename){
+	_filename = filename;
+	write();
 }
 
 int TextFile::lineCount() {
@@ -39,7 +51,7 @@ int TextFile::lineCount() {
 
 void TextFile::insertLine(const int index){
 	std::vector<std::string>::iterator it = _lines.begin() + index;
-	_lines.insert(it, std::string(""));
+	_lines.insert(it, "");
 }
 
 void TextFile::editLine(int index, std::string newLine){

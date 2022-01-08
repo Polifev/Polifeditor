@@ -108,8 +108,29 @@ void Editor::eraseForward(){
 }
 
 char Editor::readChar(){
+	// TODO handle multi-byte char
 	return wgetch(_mainWindow);
 }
+
+std::string Editor::readMultibyteChar(){
+	int i = 0;
+	char buffer[256];
+	buffer[i++] = wgetch(_mainWindow);
+	wtimeout(_mainWindow, 0);
+	while((buffer[i++] = wgetch(_mainWindow)) != -1);
+	buffer[i-1] = '\0';
+	wtimeout(_mainWindow, -1);
+	return std::string(buffer);
+}
+
+void Editor::newTextFile(std::string filename){
+	if(_currentFile != nullptr){
+		delete _currentFile;
+	}
+	_currentFile = new TextFile(filename);
+	//printToConsole(L"Opened \"" + filename +"\"");
+}
+
 
 void Editor::openTextFile(std::string filename){
 	if(_currentFile != nullptr){
@@ -117,14 +138,16 @@ void Editor::openTextFile(std::string filename){
 	}
 	_currentFile = new TextFile(filename);
 	_currentFile->read();
-	printToConsole("Opened \"" + filename +"\"");
+	//printToConsole("Opened \"" + filename +"\"");
 }
 
 void Editor::save(){
 	if(_currentFile != nullptr){
 		_currentFile->write();
+		//printToConsole("File saved.");
+	} else {
+		
 	}
-	printToConsole("File saved.");
 }
 
 void Editor::dispose(){

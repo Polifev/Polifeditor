@@ -7,6 +7,7 @@ class TextFile {
 	public:
 		TextFile(std::string filename);
 		void write();
+		void writeAs(std::string filename);
 		void read();
 
 		int lineCount();
@@ -16,6 +17,5 @@ class TextFile {
 		std::string getLine(int index);
 	private:
 		std::string _filename;
-		std::string _buffer;
 		std::vector<std::string> _lines;
 };

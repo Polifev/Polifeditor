@@ -23,7 +23,9 @@ class Editor {
 		void eraseForward();
 
 		char readChar();
+		std::string readMultibyteChar();
 
+		void newTextFile(std::string filename);
 		void openTextFile(std::string filename);
 		void save();
 		void dispose();
