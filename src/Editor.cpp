@@ -2,31 +2,40 @@
 #include "Math.hpp"
 
 #define TABSTOP 4
+#define EMPTY_LINE '~'
 
-Editor::Editor(WINDOW* mainWindow): _mainWindow{mainWindow} {}
+Editor::Editor(WINDOW* mainWindow): _mainWindow{mainWindow}, _verticalScroll{getmaxy(mainWindow)} {
+	_verticalScroll = ScrollingWindow(getmaxy(mainWindow));
+}
 
 void Editor::refresh(){
 	wrefresh(_mainWindow);
 }
 
-void Editor::renderLine(int index){
-	wmove(_mainWindow, index, 0);
+void Editor::renderRow(int row){
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	wmove(_mainWindow, row, 0);
 	wclrtoeol(_mainWindow);
-	wmove(_mainWindow, index, TABSTOP * _currentFile->getIndentation(index));
-	waddstr(_mainWindow, _currentFile->getLine(index).c_str());
+	wmove(_mainWindow, row, TABSTOP * _currentFile->getIndentation(lineIndex));
+	waddstr(_mainWindow, _currentFile->getLine(lineIndex).c_str());
 }
 
-void Editor::renderFilePortion(int start) {
+void Editor::renderFilePortion() {
+	int tempX = getcurx(_mainWindow);
+	int tempY = getcury(_mainWindow);
+
 	int maxY = getmaxy(_mainWindow);
 	int i;
-	for(i = 0; i < _currentFile->lineCount() && i < maxY; i++) {
-		renderLine(i);
+	for(i = _verticalScroll.getStart(); i < _verticalScroll.getEnd(); i++) {
+		renderRow(i - _verticalScroll.getStart());
 	}
-	for(; i < maxY - 1; i++){
+	for(; i < maxY; i++){
 		wmove(_mainWindow, i, 0);
-		waddch(_mainWindow, '~');
+		waddch(_mainWindow, EMPTY_LINE);
 		wclrtoeol(_mainWindow);
 	}
+
+	moveTo(tempY, tempX);
 }
 
 void Editor::move(int rowDelta, int colDelta){
@@ -36,9 +45,26 @@ void Editor::move(int rowDelta, int colDelta){
 }
 
 void Editor::moveTo(int row, int col){
-	row = clamp(row, 0, _currentFile->lineCount()-1);
-	std::string str = _currentFile->getLine(row);
-	int indentationOffset = _currentFile->getIndentation(row)*TABSTOP;
+	int maxRow = getmaxy(_mainWindow);
+	int overflow = row - maxRow + 1;
+	int underflow = row;
+	
+	_verticalScroll.setContentSize(_currentFile->lineCount());
+	if(overflow > 0){
+		_verticalScroll.scrollOf(overflow);
+		row = maxRow;
+	} else if(underflow < 0) {
+		_verticalScroll.scrollOf(underflow);
+		row = 0;
+	}
+
+	if(row > _currentFile->lineCount() - 1){
+		row = _currentFile->lineCount() - 1;
+	}
+
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	std::string str = _currentFile->getLine(lineIndex);
+	int indentationOffset = _currentFile->getIndentation(lineIndex)*TABSTOP;
 	col = clamp(col, indentationOffset, indentationOffset + str.size());
 	wmove(_mainWindow, row, col);
 }
@@ -46,63 +72,67 @@ void Editor::moveTo(int row, int col){
 void Editor::insertChar(char c){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex; // TODO will be used for v-scrolling
-	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
+	int lineIndex = _verticalScroll.getStart() + row;
+	int charIndex = col - _currentFile->getIndentation(lineIndex)*TABSTOP;
 
-	std::string str = _currentFile->getLine(row);
+	std::string str = _currentFile->getLine(lineIndex);
 	str.insert(charIndex, 1, c);
-	_currentFile->editLine(row, str);
+	_currentFile->editLine(lineIndex, str);
 
-	// Render and replace cursor
-	renderLine(row);
 	moveTo(row, col+1);
 }
 
 void Editor::insertNewLine(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	int charIndex = col - _currentFile->getIndentation(lineIndex)*TABSTOP;
 
-	std::string str = _currentFile->getLine(row);
-	int indentation = _currentFile->getIndentation(row);
+	std::string str = _currentFile->getLine(lineIndex);
+	int indentation = _currentFile->getIndentation(lineIndex);
 
 	std::string firstHalf = str.substr(0, charIndex);
 	std::string secondHalf = str.substr(charIndex);
-	_currentFile->insertLine(row);
-	_currentFile->editLine(row, firstHalf);
-	_currentFile->setIndentation(row, indentation);
-	_currentFile->editLine(row+1, secondHalf);
-	_currentFile->setIndentation(row+1, 0);
+	_currentFile->insertLine(lineIndex);
+	_currentFile->editLine(lineIndex, firstHalf);
+	_currentFile->setIndentation(lineIndex, indentation);
+	_currentFile->editLine(lineIndex+1, secondHalf);
+	_currentFile->setIndentation(lineIndex+1, 0);
 
-	// Render and replace cursor
-	renderFilePortion(0);
 	moveTo(row+1, 0);
 }
 
 void Editor::eraseBackward(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	int charIndex = col - _currentFile->getIndentation(lineIndex)*TABSTOP;
 
-	std::string str = _currentFile->getLine(row);
+	std::string str = _currentFile->getLine(lineIndex);
 
 	if(charIndex == 0){
-		if(_currentFile->getIndentation(row) > 0){
+		if(_currentFile->getIndentation(lineIndex) > 0){
+			// Remove indentation
 			unindent();
-		} else if(row > 0){
+		} else if(lineIndex > 0){
 			// Remove line feed
-			std::string firstHalf = _currentFile->getLine(row - 1);
-			_currentFile->editLine(row - 1, firstHalf + str);
-			_currentFile->removeLine(row);
-			renderFilePortion(0);
-			moveTo(row-1, firstHalf.size());
+			std::string firstHalf = _currentFile->getLine(lineIndex - 1);
+			_currentFile->editLine(lineIndex - 1, firstHalf + str);
+			_currentFile->removeLine(lineIndex);
+
+			if(_verticalScroll.getStart() == 0){
+				_verticalScroll.setContentSize(_currentFile->lineCount());
+				moveTo(row-1, firstHalf.size());
+			} else {
+				_verticalScroll.setContentSize(_currentFile->lineCount());
+				moveTo(row, firstHalf.size());
+			}
 		}
 	} else if(charIndex > 0) {
 		// Remove character
 		std::string firstHalf = str.substr(0, charIndex-1);
 		std::string secondHalf = str.substr(charIndex);
-		_currentFile->editLine(row, firstHalf + secondHalf);
-		renderLine(row);
+		_currentFile->editLine(lineIndex, firstHalf + secondHalf);
 		moveTo(row, col-1);
 	}
 }
@@ -110,22 +140,22 @@ void Editor::eraseBackward(){
 void Editor::eraseForward(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	int charIndex = col - _currentFile->getIndentation(lineIndex)*TABSTOP;
 
-	std::string str = _currentFile->getLine(row);
+	std::string str = _currentFile->getLine(lineIndex);
 
-	if(charIndex == str.length() && row < _currentFile->lineCount()-1){
+	if(charIndex == str.length() && lineIndex < _currentFile->lineCount()-1){
 		// Remove line feed
-		std::string secondHalf = _currentFile->getLine(row+1);
-		_currentFile->editLine(row, str + secondHalf);
-		_currentFile->removeLine(row+1);
-		renderFilePortion(0);
+		std::string secondHalf = _currentFile->getLine(lineIndex+1);
+		_currentFile->editLine(lineIndex, str + secondHalf);
+		_currentFile->removeLine(lineIndex+1);
+		_verticalScroll.setContentSize(_currentFile->lineCount());
 		moveTo(row, col);
 	} else {
 		// Remove character
-		str.erase(col, 1);
-		_currentFile->editLine(row, str);
-		renderLine(row);
+		str.erase(charIndex, 1);
+		_currentFile->editLine(lineIndex, str);
 		moveTo(row, col);
 	}
 }
@@ -133,24 +163,17 @@ void Editor::eraseForward(){
 void Editor::indent(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-
-	_currentFile->indentLine(row);
-	renderLine(row);
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	_currentFile->indentLine(lineIndex);
 	moveTo(row, col+TABSTOP);
 }
 
 void Editor::unindent(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-
-	_currentFile->unindentLine(row);
-	renderLine(row);
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	_currentFile->unindentLine(lineIndex);
 	moveTo(row, col-TABSTOP);
-}
-
-char Editor::readChar(){
-	// TODO handle multi-byte char
-	return wgetch(_mainWindow);
 }
 
 std::string Editor::readMultibyteChar(){
@@ -167,30 +190,3 @@ std::string Editor::readMultibyteChar(){
 void Editor::setFile(TextFile* file){
 	_currentFile = file;
 }
-
-/*void Editor::newTextFile(std::string filename){
-	if(_currentFile != nullptr){
-		delete _currentFile;
-	}
-	_currentFile = new TextFile(filename);
-	//printToConsole(L"Opened \"" + filename +"\"");
-}
-
-
-void Editor::openTextFile(std::string filename){
-	if(_currentFile != nullptr){
-		delete _currentFile;
-	}
-	_currentFile = new TextFile(filename);
-	_currentFile->read();
-	//printToConsole("Opened \"" + filename +"\"");
-}
-
-void Editor::save(){
-	if(_currentFile != nullptr){
-		_currentFile->write();
-		//printToConsole("File saved.");
-	} else {
-		
-	}
-}*/

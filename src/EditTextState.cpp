@@ -6,10 +6,13 @@
 #define CTRL_KEY(key) ((key) & 0x1f)
 
 AppState EditTextState::processInput(AppContext& context){
+	context.editor()->renderFilePortion();
+	context.editor()->refresh();
 	//unsigned char c = context.editor()->readChar();
 	std::string str = context.editor()->readMultibyteChar();
 	if(str.size() == 1){
 		unsigned char c = str[0];
+		context.console()->show(str);
 		if(c == 255){
 			// TimeoutChar
 		} else if(iscntrl(c)){
@@ -64,6 +67,5 @@ AppState EditTextState::processInput(AppContext& context){
 			context.console()->show(str);
 		}
 	}
-	context.editor()->refresh();
 	return APPSTATE_EDIT;
 }

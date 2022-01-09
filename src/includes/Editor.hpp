@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TextFile.hpp"
+#include "ScrollingWindow.hpp"
 
 #include <string>
 
@@ -10,9 +11,8 @@ class Editor {
 	public:
 		Editor(WINDOW* mainWindow);
 		void refresh();
-		void renderLine(int index);
-		void renderFilePortion(int start);
-		//void printToConsole(std::string message);
+		void renderRow(int index);
+		void renderFilePortion();
 
 		void move(int rowDelta, int colDelta);
 		void moveTo(int row, int col);
@@ -24,17 +24,13 @@ class Editor {
 		void indent();
 		void unindent();
 
-		char readChar();
 		std::string readMultibyteChar();
 
 		void setFile(TextFile* file);
 
-		//void newTextFile(std::string filename);
-		//void openTextFile(std::string filename);
-		//void save();
-
 	private:
 		WINDOW* _mainWindow = 0;
 		TextFile* _currentFile = nullptr;
-		//WINDOW* _console = 0;
+
+		ScrollingWindow _verticalScroll;
 };

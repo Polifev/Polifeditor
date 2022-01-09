@@ -13,6 +13,7 @@ set(SRC
 	src/Editor.cpp
 	src/EditTextState.cpp
 	src/SaveState.cpp
+	src/ScrollingWindow.cpp
 	src/TextFile.cpp
 	src/main.cpp
 )
