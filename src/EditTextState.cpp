@@ -29,8 +29,6 @@ AppState EditTextState::processInput(AppContext& context){
 				case '\t':
 					context.editor()->indent();
 					break;
-				/*case CTRL_KEY('\t'):
-					context.editor()->unindent();*/
 				default :
 					break;
 			}
@@ -42,20 +40,26 @@ AppState EditTextState::processInput(AppContext& context){
 		if(str[0] == 27){
 			str = str.substr(1);
 		}
-		if(str == "[A"){
+		if(str == "[A"){ // UP
 			context.editor()->move(-1, 0);
-		} else if (str == "[B"){
+		} else if (str == "[B"){ // DOWN
 			context.editor()->move(1, 0);
-		} else if (str == "[C"){
+		} else if (str == "[C"){ // RIGHT
 			context.editor()->move(0, 1);
-		} else if (str == "[D"){
+		} else if (str == "[D"){ // LEFT
 			context.editor()->move(0, -1);
-		} else if (str == "[3~") {
+		} else if (str == "[3~") { // DEL
 			context.editor()->eraseForward();
-		} else if (str == "[H") {
-			context.editor()->move(0, -1000);
-		} else if (str == "[F") {
-			context.editor()->move(0, 1000);
+		} else if (str == "[H") { // HOME
+			context.editor()->move(0, -100000);
+		} else if (str == "[1;5H") { // Ctrl+HOME
+			context.editor()->move(-100000, -100000);
+		} else if (str == "[F") { // END
+			context.editor()->move(0, 100000);
+		} else if (str == "[1;5F") { // Ctrl+END
+			context.editor()->move(100000, 100000);
+		} else if (str == "[Z") { // Shift+TAB
+			context.editor()->unindent();
 		} else {
 			context.console()->show(str);
 		}
