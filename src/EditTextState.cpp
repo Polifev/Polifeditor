@@ -8,11 +8,15 @@
 AppState EditTextState::processInput(AppContext& context){
 	context.editor()->renderFilePortion();
 	context.editor()->refresh();
-	//unsigned char c = context.editor()->readChar();
 	std::string str = context.editor()->readMultibyteChar();
+	
+	//context.console()->show(str);
+	char buff[256];
+	sprintf(buff, "[%d]", str[0]);
+	context.console()->show(buff);
+
 	if(str.size() == 1){
-		unsigned char c = str[0];
-		context.console()->show(str);
+		char c = str[0];
 		if(c == 255){
 			// TimeoutChar
 		} else if(iscntrl(c)){
@@ -64,7 +68,7 @@ AppState EditTextState::processInput(AppContext& context){
 		} else if (str == "[Z") { // Shift+TAB
 			context.editor()->unindent();
 		} else {
-			context.console()->show(str);
+			//context.console()->show(str);
 		}
 	}
 	return APPSTATE_EDIT;

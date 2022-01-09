@@ -25,7 +25,26 @@ void TextFile::read(){
 		// File cannot be opened ==> In-Memory buffer
 	} else {
 		std::string line;
-		while(std::getline(inFile, line)){
+		char c;
+		int indentation;
+		int charint;
+		while((charint = inFile.get()) != EOF){
+			c = (char) charint;
+			if(c == '\t' && line.empty()){
+				indentation++;
+			} else if(c == '\n'){
+				_indentation.push_back(indentation);
+				_lines.push_back(line);
+				indentation = 0;
+				line = std::string();
+			} else {
+				line.push_back(c);
+			}
+		}
+		_indentation.push_back(indentation);
+		_lines.push_back(line);
+
+		/*while(std::getline(inFile, line)){
 			int indentation = 0;
 			while(line[indentation] == '\t'){
 				indentation++;
@@ -33,6 +52,10 @@ void TextFile::read(){
 			_indentation.push_back(indentation);
 			_lines.push_back(line.substr(indentation));
 		}
+		if(inFile.good()){
+			_lines.push_back("");
+			_indentation.push_back(0);
+		}*/
 	}
 	inFile.close();
 }
