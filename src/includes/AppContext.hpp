@@ -1,5 +1,6 @@
 #pragma once
 #include "Editor.hpp"
+#include "Console.hpp"
 
 class AppContext {
 	public:
@@ -7,10 +8,13 @@ class AppContext {
 		void dispose();
 
 		Editor* editor();
+		Console* console();
 
 	private:
-		Editor* _editor;
 		WINDOW* _mainWindow;
 		WINDOW* _consoleWindow;
+
+		Editor* _editor;
+		Console* _console;
 		TextFile* _openedFile; // TODO: replace with multiple files manager
 };

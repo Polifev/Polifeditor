@@ -17,6 +17,7 @@ set (
 set(SRC
 	src/App.cpp
 	src/AppContext.cpp
+	src/Console.cpp
 	src/Editor.cpp
 	src/EditTextState.cpp
 	src/TextFile.cpp

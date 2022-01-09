@@ -14,14 +14,21 @@ AppContext::AppContext(){
 	_editor->renderFilePortion(0);
 	_editor->moveTo(0, 0);
 	_editor->refresh();
+
+	_console = new Console(_consoleWindow);
 }
 
 void AppContext::dispose(){
 	delete _editor;
+	delete _console;
 	delete _openedFile;
 	endwin();
 }
 
 Editor* AppContext::editor(){
 	return _editor;
+}
+
+Console* AppContext::console(){
+	return _console;
 }

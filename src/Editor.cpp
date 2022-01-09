@@ -26,13 +26,6 @@ void Editor::renderFilePortion(int start) {
 	}
 }
 
-/*void Editor::printToConsole(std::string message){
-	wmove(_console, 0, 0);
-	waddstr(_console, message.c_str());
-	wclrtoeol(_console);
-	wrefresh(_console);
-}*/
-
 void Editor::move(int rowDelta, int colDelta){
 	int row = getcury(_mainWindow) + rowDelta;
 	int col = getcurx(_mainWindow) + colDelta;
@@ -100,6 +93,25 @@ void Editor::eraseBackward(){
 
 void Editor::eraseForward(){
 	//TODO
+	int row = getcury(_mainWindow);
+	int col = getcurx(_mainWindow);
+
+	std::string str = _currentFile->getLine(row);
+
+	if(col == str.length() && row < _currentFile->lineCount()-1){
+		// Remove line feed
+		std::string secondHalf = _currentFile->getLine(row+1);
+		_currentFile->editLine(row, str + secondHalf);
+		_currentFile->removeLine(row+1);
+		renderFilePortion(0);
+		wmove(_mainWindow, row, col);
+	} else {
+		// Remove character
+		str.erase(col, 1);
+		_currentFile->editLine(row, str);
+		renderLine(row);
+		wmove(_mainWindow, row, col);
+	}
 }
 
 char Editor::readChar(){

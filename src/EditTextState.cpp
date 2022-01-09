@@ -35,14 +35,21 @@ AppState EditTextState::processInput(AppContext& context){
 		}
 	} else {
 		// Parse escape sequence
-		if(str == "^[A"){
+		if(str[0] == 27){
+			str = str.substr(1);
+		}
+		if(str == "[A"){
 			context.editor()->move(-1, 0);
-		} else if (str== "^[B"){
+		} else if (str == "[B"){
 			context.editor()->move(1, 0);
-		} else if (str== "^[C"){
+		} else if (str == "[C"){
 			context.editor()->move(0, 1);
-		} else if (str== "^[D"){
+		} else if (str == "[D"){
 			context.editor()->move(0, -1);
+		} else if (str == "[3~") {
+			context.editor()->eraseForward();
+		} else {
+			context.console()->show(str);
 		}
 	}
 	context.editor()->refresh();
