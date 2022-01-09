@@ -1,19 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(Polifeditor)
 
-# Include folder
-#set (
-#	INCLUDES
-#	src/includes/**.h
-#)
 
-# Ncurses library
-set (
-	NCURSES_LIB
-	/usr/lib/x86_64-linux-gnu/libncurses.so
-)
+# NCURSES library
+Find_package(Curses)
 
-#aux_source_directory(src SRC)
+# every source file
 set(SRC
 	src/App.cpp
 	src/AppContext.cpp
@@ -25,8 +17,11 @@ set(SRC
 	src/main.cpp
 )
 
+# headers location
 include_directories(src/includes)
 	
+# build executable
 add_executable(Polifeditor ${SRC} ${INCLUDES})
 
-target_link_libraries(Polifeditor ${NCURSES_LIB})
+# link libraries
+target_link_libraries(Polifeditor ${CURSES_LIBRARIES})
