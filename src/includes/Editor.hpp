@@ -8,11 +8,11 @@
 
 class Editor {
 	public:
-		Editor();
+		Editor(WINDOW* mainWindow);
 		void refresh();
 		void renderLine(int index);
 		void renderFilePortion(int start);
-		void printToConsole(std::string message);
+		//void printToConsole(std::string message);
 
 		void move(int rowDelta, int colDelta);
 		void moveTo(int row, int col);
@@ -25,13 +25,14 @@ class Editor {
 		char readChar();
 		std::string readMultibyteChar();
 
-		void newTextFile(std::string filename);
-		void openTextFile(std::string filename);
-		void save();
-		void dispose();
+		void setFile(TextFile* file);
+
+		//void newTextFile(std::string filename);
+		//void openTextFile(std::string filename);
+		//void save();
 
 	private:
 		WINDOW* _mainWindow = 0;
-		WINDOW* _console = 0;
 		TextFile* _currentFile = nullptr;
+		//WINDOW* _console = 0;
 };

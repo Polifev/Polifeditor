@@ -13,7 +13,16 @@ set (
 	/usr/lib/x86_64-linux-gnu/libncurses.so
 )
 
-aux_source_directory(src SRC)
+#aux_source_directory(src SRC)
+set(SRC
+	src/App.cpp
+	src/AppContext.cpp
+	src/Editor.cpp
+	src/EditTextState.cpp
+	src/TextFile.cpp
+	src/main.cpp
+)
+
 include_directories(src/includes)
 	
 add_executable(Polifeditor ${SRC} ${INCLUDES})

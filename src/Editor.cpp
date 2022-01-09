@@ -1,12 +1,7 @@
 #include "Editor.hpp"
 #include "Math.hpp"
 
-Editor::Editor() {
-	initscr();
-	noecho();
-	_mainWindow = subwin(stdscr, LINES-1, COLS, 0, 0);
-	_console = subwin(stdscr, 1, COLS, LINES-1, 0);
-}
+Editor::Editor(WINDOW* mainWindow): _mainWindow{mainWindow} {}
 
 void Editor::refresh(){
 	wrefresh(_mainWindow);
@@ -31,12 +26,12 @@ void Editor::renderFilePortion(int start) {
 	}
 }
 
-void Editor::printToConsole(std::string message){
+/*void Editor::printToConsole(std::string message){
 	wmove(_console, 0, 0);
 	waddstr(_console, message.c_str());
 	wclrtoeol(_console);
 	wrefresh(_console);
-}
+}*/
 
 void Editor::move(int rowDelta, int colDelta){
 	int row = getcury(_mainWindow) + rowDelta;
@@ -123,7 +118,11 @@ std::string Editor::readMultibyteChar(){
 	return std::string(buffer);
 }
 
-void Editor::newTextFile(std::string filename){
+void Editor::setFile(TextFile* file){
+	_currentFile = file;
+}
+
+/*void Editor::newTextFile(std::string filename){
 	if(_currentFile != nullptr){
 		delete _currentFile;
 	}
@@ -148,14 +147,4 @@ void Editor::save(){
 	} else {
 		
 	}
-}
-
-void Editor::dispose(){
-	if(_currentFile != nullptr){
-		delete _currentFile;
-	}
-	
-	//free(_mainWindow);
-	//free(_console);
-	endwin();
-}
+}*/
