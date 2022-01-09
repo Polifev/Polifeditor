@@ -25,7 +25,7 @@ AppState EditTextState::processInput(AppContext& context){
 				case CTRL_KEY('x'):
 					nextState = APPSTATE_EXIT;
 					break;
-				case CTRL_KEY('w'):
+				case CTRL_KEY('o'):
 					nextState = APPSTATE_SAVE;
 					break;
 				case NEW_LINE:
