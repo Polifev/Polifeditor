@@ -24,6 +24,8 @@ int main(int argc, char** argv) {
 	
 	if(argc > 1){
 		editor.openTextFile(argv[1]);
+	} else {
+		editor.newTextFile("/home/pol/texte.txt");
 	}
 	
 	editor.renderFilePortion(0);
@@ -33,9 +35,9 @@ int main(int argc, char** argv) {
 	bool escape = false;
 	bool bracket = false;
 	while(! exit) {
-		std::string mc = editor.readMultibyteChar();
+		/*std::string mc = editor.readMultibyteChar();
 		editor.printToConsole(mc);
-		continue;
+		continue;*/
 		
 		unsigned char c = editor.readChar();
 		
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
 				default :
 					std::ostringstream output;
 					output << (int) c;
-					//editor.printToConsole(output.str());
+					editor.printToConsole(output.str());
 					break;
 			}
 		} else {

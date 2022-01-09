@@ -33,9 +33,10 @@ void TextFile::write() {
 	std::ofstream outFile;
 	outFile.open(_filename);
 	if(outFile){
-		for(const std::string &line: _lines){
-			outFile << line << std::endl;
+		for(int i = 0; i < _lines.size() - 1; i++){
+			outFile << _lines[i] << std::endl;
 		}
+		outFile << _lines[_lines.size() - 1];
 	}
 	outFile.close();
 }
