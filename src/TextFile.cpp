@@ -43,19 +43,6 @@ void TextFile::read(){
 		}
 		_indentation.push_back(indentation);
 		_lines.push_back(line);
-
-		/*while(std::getline(inFile, line)){
-			int indentation = 0;
-			while(line[indentation] == '\t'){
-				indentation++;
-			}
-			_indentation.push_back(indentation);
-			_lines.push_back(line.substr(indentation));
-		}
-		if(inFile.good()){
-			_lines.push_back("");
-			_indentation.push_back(0);
-		}*/
 	}
 	inFile.close();
 }

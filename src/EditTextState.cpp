@@ -11,21 +11,22 @@ AppState EditTextState::processInput(AppContext& context){
 	std::string str = context.editor()->readMultibyteChar();
 	
 	//context.console()->show(str);
-	char buff[256];
-	sprintf(buff, "[%d]", str[0]);
-	context.console()->show(buff);
+	//char buff[256];
+	//sprintf(buff, "[%d]", str[0]);
+	//context.console()->show(buff);
+
+	AppState nextState = APPSTATE_EDIT;
 
 	if(str.size() == 1){
+		// MONO-BYTE characters handling
 		char c = str[0];
-		if(c == 255){
-			// TimeoutChar
-		} else if(iscntrl(c)){
+		if(iscntrl(c)){
 			switch (c) {
 				case CTRL_KEY('x'):
-					return APPSTATE_EXIT;
+					nextState = APPSTATE_EXIT;
 					break;
 				case CTRL_KEY('w'):
-					return APPSTATE_SAVE;
+					nextState = APPSTATE_SAVE;
 					break;
 				case NEW_LINE:
 					context.editor()->insertNewLine();
@@ -43,7 +44,7 @@ AppState EditTextState::processInput(AppContext& context){
 			context.editor()->insertChar(c);
 		}
 	} else {
-		// Parse escape sequence
+		// MULTI-BYTE character handling
 		if(str[0] == 27){
 			str = str.substr(1);
 		}
@@ -68,8 +69,8 @@ AppState EditTextState::processInput(AppContext& context){
 		} else if (str == "[Z") { // Shift+TAB
 			context.editor()->unindent();
 		} else {
-			//context.console()->show(str);
+			context.console()->show(str);
 		}
 	}
-	return APPSTATE_EDIT;
+	return nextState;
 }
