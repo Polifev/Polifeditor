@@ -21,6 +21,8 @@ class Editor {
 		void insertNewLine();
 		void eraseBackward();
 		void eraseForward();
+		void indent();
+		void unindent();
 
 		char readChar();
 		std::string readMultibyteChar();

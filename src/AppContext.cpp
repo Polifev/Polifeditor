@@ -32,3 +32,7 @@ Editor* AppContext::editor(){
 Console* AppContext::console(){
 	return _console;
 }
+
+void AppContext::saveFile() {
+	_openedFile->write();
+}

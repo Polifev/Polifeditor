@@ -20,6 +20,7 @@ set(SRC
 	src/Console.cpp
 	src/Editor.cpp
 	src/EditTextState.cpp
+	src/SaveState.cpp
 	src/TextFile.cpp
 	src/main.cpp
 )

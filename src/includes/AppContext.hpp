@@ -10,6 +10,7 @@ class AppContext {
 		Editor* editor();
 		Console* console();
 
+		void saveFile();
 	private:
 		WINDOW* _mainWindow;
 		WINDOW* _consoleWindow;

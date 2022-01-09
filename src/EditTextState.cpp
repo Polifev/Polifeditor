@@ -18,8 +18,7 @@ AppState EditTextState::processInput(AppContext& context){
 					return APPSTATE_EXIT;
 					break;
 				case CTRL_KEY('w'):
-					//context.editor()->save();
-					// TODO return APPSTATE_SAVE
+					return APPSTATE_SAVE;
 					break;
 				case NEW_LINE:
 					context.editor()->insertNewLine();
@@ -27,6 +26,11 @@ AppState EditTextState::processInput(AppContext& context){
 				case BACK_SPACE:
 					context.editor()->eraseBackward();
 					break;
+				case '\t':
+					context.editor()->indent();
+					break;
+				/*case CTRL_KEY('\t'):
+					context.editor()->unindent();*/
 				default :
 					break;
 			}
@@ -48,6 +52,10 @@ AppState EditTextState::processInput(AppContext& context){
 			context.editor()->move(0, -1);
 		} else if (str == "[3~") {
 			context.editor()->eraseForward();
+		} else if (str == "[H") {
+			context.editor()->move(0, -1000);
+		} else if (str == "[F") {
+			context.editor()->move(0, 1000);
 		} else {
 			context.console()->show(str);
 		}

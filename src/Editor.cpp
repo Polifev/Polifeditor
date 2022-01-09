@@ -1,6 +1,8 @@
 #include "Editor.hpp"
 #include "Math.hpp"
 
+#define TABSTOP 4
+
 Editor::Editor(WINDOW* mainWindow): _mainWindow{mainWindow} {}
 
 void Editor::refresh(){
@@ -9,8 +11,9 @@ void Editor::refresh(){
 
 void Editor::renderLine(int index){
 	wmove(_mainWindow, index, 0);
-	waddstr(_mainWindow, _currentFile->getLine(index).c_str());
 	wclrtoeol(_mainWindow);
+	wmove(_mainWindow, index, TABSTOP * _currentFile->getIndentation(index));
+	waddstr(_mainWindow, _currentFile->getLine(index).c_str());
 }
 
 void Editor::renderFilePortion(int start) {
@@ -35,83 +38,114 @@ void Editor::move(int rowDelta, int colDelta){
 void Editor::moveTo(int row, int col){
 	row = clamp(row, 0, _currentFile->lineCount()-1);
 	std::string str = _currentFile->getLine(row);
-	col = clamp(col, 0, str.size());
+	int indentationOffset = _currentFile->getIndentation(row)*TABSTOP;
+	col = clamp(col, indentationOffset, indentationOffset + str.size());
 	wmove(_mainWindow, row, col);
 }
 
 void Editor::insertChar(char c){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
+	int lineIndex; // TODO will be used for v-scrolling
+	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
 
 	std::string str = _currentFile->getLine(row);
-	str.insert(col, 1, c);
+	str.insert(charIndex, 1, c);
 	_currentFile->editLine(row, str);
 
 	// Render and replace cursor
 	renderLine(row);
-	wmove(_mainWindow, row, col+1);
+	moveTo(row, col+1);
 }
 
 void Editor::insertNewLine(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
+	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
 
 	std::string str = _currentFile->getLine(row);
-	std::string firstHalf = str.substr(0, col);
-	std::string secondHalf = str.substr(col);
+	int indentation = _currentFile->getIndentation(row);
+
+	std::string firstHalf = str.substr(0, charIndex);
+	std::string secondHalf = str.substr(charIndex);
 	_currentFile->insertLine(row);
 	_currentFile->editLine(row, firstHalf);
+	_currentFile->setIndentation(row, indentation);
 	_currentFile->editLine(row+1, secondHalf);
+	_currentFile->setIndentation(row+1, 0);
 
 	// Render and replace cursor
 	renderFilePortion(0);
-	wmove(_mainWindow, row+1, 0);
+	moveTo(row+1, 0);
 }
 
 void Editor::eraseBackward(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
+	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
 
 	std::string str = _currentFile->getLine(row);
 
-	if(col == 0 && row > 0){
-		// Remove line feed
-		std::string firstHalf = _currentFile->getLine(row - 1);
-		_currentFile->editLine(row - 1, firstHalf + str);
-		_currentFile->removeLine(row);
-		renderFilePortion(0);
-		wmove(_mainWindow, row-1, firstHalf.size());
-	} else if(col > 0) {
+	if(charIndex == 0){
+		if(_currentFile->getIndentation(row) > 0){
+			unindent();
+		} else if(row > 0){
+			// Remove line feed
+			std::string firstHalf = _currentFile->getLine(row - 1);
+			_currentFile->editLine(row - 1, firstHalf + str);
+			_currentFile->removeLine(row);
+			renderFilePortion(0);
+			moveTo(row-1, firstHalf.size());
+		}
+	} else if(charIndex > 0) {
 		// Remove character
-		std::string firstHalf = str.substr(0, col-1);
-		std::string secondHalf = str.substr(col);
+		std::string firstHalf = str.substr(0, charIndex-1);
+		std::string secondHalf = str.substr(charIndex);
 		_currentFile->editLine(row, firstHalf + secondHalf);
 		renderLine(row);
-		wmove(_mainWindow, row, col-1);
+		moveTo(row, col-1);
 	}
 }
 
 void Editor::eraseForward(){
-	//TODO
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
+	int charIndex = col - _currentFile->getIndentation(row)*TABSTOP;
 
 	std::string str = _currentFile->getLine(row);
 
-	if(col == str.length() && row < _currentFile->lineCount()-1){
+	if(charIndex == str.length() && row < _currentFile->lineCount()-1){
 		// Remove line feed
 		std::string secondHalf = _currentFile->getLine(row+1);
 		_currentFile->editLine(row, str + secondHalf);
 		_currentFile->removeLine(row+1);
 		renderFilePortion(0);
-		wmove(_mainWindow, row, col);
+		moveTo(row, col);
 	} else {
 		// Remove character
 		str.erase(col, 1);
 		_currentFile->editLine(row, str);
 		renderLine(row);
-		wmove(_mainWindow, row, col);
+		moveTo(row, col);
 	}
+}
+
+void Editor::indent(){
+	int row = getcury(_mainWindow);
+	int col = getcurx(_mainWindow);
+
+	_currentFile->indentLine(row);
+	renderLine(row);
+	moveTo(row, col+TABSTOP);
+}
+
+void Editor::unindent(){
+	int row = getcury(_mainWindow);
+	int col = getcurx(_mainWindow);
+
+	_currentFile->unindentLine(row);
+	renderLine(row);
+	moveTo(row, col-TABSTOP);
 }
 
 char Editor::readChar(){
