@@ -11,7 +11,7 @@ AppContext::AppContext(){
 	
 	_editor = new Editor(_mainWindow);
 	_editor->setFile(_openedFile);
-	_editor->renderFilePortion();
+	_editor->renderFile();
 	_editor->moveTo(0, 0);
 	_editor->refresh();
 

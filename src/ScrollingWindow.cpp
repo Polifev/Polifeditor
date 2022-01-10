@@ -1,18 +1,9 @@
 #include "ScrollingWindow.hpp"
 
-int floor(int x, int min){
-	return x < min ? min : x;
-}
-
-int ceil(int x, int max){
-	return x > max ? max : x;
-}
-
 ScrollingWindow::ScrollingWindow(int size): _size {size}, _position {0}, _contentSize{0}{
-
 }
 
-void ScrollingWindow::scrollOf(int delta){
+void ScrollingWindow::move(int delta){
 	_position += delta;
 	clampPosition();
 }
@@ -45,6 +36,6 @@ int ScrollingWindow::getAbsoluteIndex(int row){
 void ScrollingWindow::clampPosition(){
 	// recompute position
 	int hiddenSize = _contentSize - _size;
-	_position = ceil(_position, hiddenSize);
-	_position = floor(_position, 0);
+	_position = _position > hiddenSize ? hiddenSize : _position;
+	_position = _position < 0 ? 0 : _position;
 }

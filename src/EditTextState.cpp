@@ -6,7 +6,7 @@
 #define CTRL_KEY(key) ((key) & 0x1f)
 
 AppState EditTextState::processInput(AppContext& context){
-	context.editor()->renderFilePortion();
+	context.editor()->renderFile();
 	context.editor()->refresh();
 	std::string str = context.editor()->readMultibyteChar();
 	
@@ -49,25 +49,23 @@ AppState EditTextState::processInput(AppContext& context){
 			str = str.substr(1);
 		}
 		if(str == "[A"){ // UP
-			context.editor()->move(-1, 0);
+			context.editor()->moveUp();
 		} else if (str == "[B"){ // DOWN
-			context.editor()->move(1, 0);
+			context.editor()->moveDown();
 		} else if (str == "[C"){ // RIGHT
-			context.editor()->move(0, 1);
+			context.editor()->moveRight();
 		} else if (str == "[D"){ // LEFT
-			context.editor()->move(0, -1);
+			context.editor()->moveLeft();
 		} else if (str == "[3~") { // DEL
 			context.editor()->eraseForward();
 		} else if (str == "[H") { // HOME
-			context.editor()->move(0, -100000);
+			context.editor()->moveToStartOfLine();
 		} else if (str == "[1;5H") { // Ctrl+HOME
-			context.editor()->move(-100000, -100000);
+			context.editor()->moveToStartOfFile();
 		} else if (str == "[F") { // END
-			context.editor()->move(0, 100000);
+			context.editor()->moveToEndOfLine();
 		} else if (str == "[1;5F") { // Ctrl+END
-			context.editor()->move(100000, 100000);
-		} else if (str == "[Z") { // Shift+TAB
-			context.editor()->unindent();
+			context.editor()->moveToEndOfFile();
 		} else {
 			context.console()->show(str);
 		}

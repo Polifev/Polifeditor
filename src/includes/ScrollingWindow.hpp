@@ -1,7 +1,9 @@
+#pragma once
+
 class ScrollingWindow {
 	public:
 		ScrollingWindow(int size);
-		void scrollOf(int delta);
+		void move(int delta);
 		void resize(int size);
 		void setContentSize(int contentSize);
 		int getStart();

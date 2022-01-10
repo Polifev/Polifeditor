@@ -10,11 +10,19 @@
 class Editor {
 	public:
 		Editor(WINDOW* mainWindow);
+		
 		void refresh();
-		void renderRow(int index);
-		void renderFilePortion();
+		void renderFile();
 
-		void move(int rowDelta, int colDelta);
+		void moveUp();
+		void moveDown();
+		void moveRight();
+		void moveLeft();
+		void moveToStartOfFile();
+		void moveToEndOfFile();
+		void moveToStartOfLine();
+		void moveToEndOfLine();
+
 		void moveTo(int row, int col);
 
 		void insertChar(char c);
@@ -22,15 +30,17 @@ class Editor {
 		void eraseBackward();
 		void eraseForward();
 		void indent();
-		void unindent();
 
 		std::string readMultibyteChar();
 
 		void setFile(TextFile* file);
 
 	private:
+		void renderRow(int index);
+
 		WINDOW* _mainWindow = 0;
 		TextFile* _currentFile = nullptr;
 
 		ScrollingWindow _verticalScroll;
+		ScrollingWindow _horizontalScroll;
 };

@@ -11,12 +11,10 @@
 TextFile::TextFile(std::string filename) : _filename{filename} 
 {
 	_lines.push_back("");
-	_indentation.push_back(0);
 }
 
 void TextFile::read(){
 	_lines.clear();
-	_indentation.clear();
 	
 	std::ifstream inFile;
 
@@ -26,22 +24,16 @@ void TextFile::read(){
 	} else {
 		std::string line;
 		char c;
-		int indentation;
 		int charint;
 		while((charint = inFile.get()) != EOF){
 			c = (char) charint;
-			if(c == '\t' && line.empty()){
-				indentation++;
-			} else if(c == '\n'){
-				_indentation.push_back(indentation);
+			if(c == '\n'){
 				_lines.push_back(line);
-				indentation = 0;
 				line = std::string();
 			} else {
 				line.push_back(c);
 			}
 		}
-		_indentation.push_back(indentation);
 		_lines.push_back(line);
 	}
 	inFile.close();
@@ -52,13 +44,7 @@ void TextFile::write() {
 	outFile.open(_filename);
 	if(outFile){
 		for(int i = 0; i < _lines.size() - 1; i++){
-			for(int t = 0; t < _indentation[i]; t++){
-				outFile << '\t';
-			}
 			outFile << _lines[i] << std::endl;
-		}
-		for(int t = 0; t < _indentation[_lines.size() - 1]; t++){
-			outFile << '\t';
 		}
 		outFile << _lines[_lines.size() - 1];
 	}
@@ -76,7 +62,6 @@ int TextFile::lineCount() {
 
 void TextFile::insertLine(const int index){
 	_lines.insert(_lines.begin() + index, "");
-	_indentation.insert(_indentation.begin() + index, 0);
 }
 
 void TextFile::editLine(int index, std::string newLine){
@@ -86,39 +71,13 @@ void TextFile::editLine(int index, std::string newLine){
 	// Error
 }
 
-void TextFile::setIndentation(int index, int indentation){
-	if(_lines.size() > index && index >= 0){
-		_indentation[index] = indentation;
-	}
-}
-
-void TextFile::indentLine(int index){
-	if(_lines.size() > index && index >= 0){
-		_indentation[index] = _indentation[index] + 1;
-	}
-}
-
-void TextFile::unindentLine(int index){
-	if(_lines.size() > index && index >= 0){
-		_indentation[index] = _indentation[index] - 1;
-		if(_indentation[index] < 0){
-			_indentation[index] = 0;
-		}
-	}
-}
-
 void TextFile::removeLine(int index){
 	if(_lines.size() > index && index >= 0){
 		_lines.erase(_lines.begin()+index);
-		_indentation.erase(_indentation.begin()+index);
 	}
 	// Error
 }
 
 std::string TextFile::getLine(int index){
 	return _lines[index];
-}
-
-int TextFile::getIndentation(int index){
-	return _indentation[index];
 }

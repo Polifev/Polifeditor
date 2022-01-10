@@ -1,3 +1,5 @@
+#pragma once
+
 enum AppState {
 	APPSTATE_INIT,
 	APPSTATE_EDIT,
