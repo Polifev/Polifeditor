@@ -31,6 +31,9 @@ class Editor {
 		void eraseForward();
 		void indent();
 
+		int getCharIndex();
+		int getLineIndex();
+
 		void setFile(TextFile* file);
 
 	private:

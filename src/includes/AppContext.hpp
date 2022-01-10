@@ -2,6 +2,7 @@
 #include "Editor.hpp"
 #include "Console.hpp"
 #include "Keyboard.hpp"
+#include "FileBrowser.hpp"
 
 class AppContext {
 	public:
@@ -11,6 +12,8 @@ class AppContext {
 		Editor* editor();
 		Console* console();
 		Keyboard* keyboard();
+		FileBrowser* fileBrowser();
+		TextFile* openedFile();
 
 		void saveFile();
 	private:
@@ -20,5 +23,6 @@ class AppContext {
 		Keyboard* _keyboard;
 		Editor* _editor;
 		Console* _console;
+		FileBrowser* _fileBrowser;
 		TextFile* _openedFile; // TODO: replace with multiple files manager
 };

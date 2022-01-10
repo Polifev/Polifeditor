@@ -46,12 +46,21 @@ void Editor::moveDown(){
 void Editor::moveLeft(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow) - 1;
+	if(col < 0 && row > 0){
+		row--;
+		col = _currentFile->getLine(_verticalScroll.getAbsoluteIndex(row)).length();
+	}
 	moveTo(row, col);
 }
 
 void Editor::moveRight(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow) + 1;
+	int rowLength = _currentFile->getLine(getLineIndex()).length();
+	if(col > rowLength && row < _currentFile->lineCount()){
+		col = 0;
+		row++;
+	}
 	moveTo(row, col);
 }
 
@@ -72,7 +81,7 @@ void Editor::moveToStartOfLine(){
 
 void Editor::moveToEndOfLine(){
 	int row = getcury(_mainWindow);
-	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	int lineIndex = getLineIndex();
 	moveTo(row, _currentFile->getLine(lineIndex).length());
 }
 
@@ -103,8 +112,8 @@ void Editor::moveTo(int row, int col){
 void Editor::insertChar(char c){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex = _verticalScroll.getStart() + row;
-	int charIndex = col;
+	int lineIndex = getLineIndex();
+	int charIndex = getCharIndex();
 
 	std::string str = _currentFile->getLine(lineIndex);
 	str.insert(charIndex, 1, c);
@@ -116,8 +125,8 @@ void Editor::insertChar(char c){
 void Editor::insertNewLine(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
-	int charIndex = col;
+	int lineIndex = getLineIndex();
+	int charIndex = getCharIndex();
 
 	std::string str = _currentFile->getLine(lineIndex);
 
@@ -132,8 +141,8 @@ void Editor::insertNewLine(){
 void Editor::eraseBackward(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
-	int charIndex = col;
+	int lineIndex = getLineIndex();
+	int charIndex = getCharIndex();
 
 	std::string str = _currentFile->getLine(lineIndex);
 
@@ -162,8 +171,8 @@ void Editor::eraseBackward(){
 void Editor::eraseForward(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
-	int charIndex = col;
+	int lineIndex = getLineIndex();
+	int charIndex = getCharIndex();
 
 	std::string str = _currentFile->getLine(lineIndex);
 
@@ -185,8 +194,8 @@ void Editor::eraseForward(){
 void Editor::indent(){
 	int row = getcury(_mainWindow);
 	int col = getcurx(_mainWindow);
-	int lineIndex = _verticalScroll.getStart() + row;
-	int charIndex = col;
+	int lineIndex = getLineIndex();
+	int charIndex = getCharIndex();
 
 	std::string str = _currentFile->getLine(lineIndex);
 	int tabCount = TABSTOP - (charIndex%TABSTOP);
@@ -202,6 +211,14 @@ void Editor::renderRow(int row){
 	wmove(_mainWindow, row, 0);
 	wclrtoeol(_mainWindow);
 	waddstr(_mainWindow, _currentFile->getLine(lineIndex).c_str());
+}
+
+int Editor::getLineIndex(){
+	return _verticalScroll.getAbsoluteIndex(getcury(_mainWindow));
+}
+
+int Editor::getCharIndex(){
+	return getcurx(_mainWindow);
 }
 
 void Editor::setFile(TextFile* file){

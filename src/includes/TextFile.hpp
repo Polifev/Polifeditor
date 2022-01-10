@@ -5,7 +5,7 @@
 
 class TextFile {
 	public:
-		TextFile(std::string filename);
+		TextFile();
 		void write();
 		void writeAs(std::string filename);
 		void read();
@@ -14,6 +14,8 @@ class TextFile {
 		void editLine(int index, std::string newLine);
 		void removeLine(int index);
 		std::string getLine(int index);
+		void filename(std::string filename);
+		std::string filename();
 	private:
 		std::string _filename;
 		std::vector<std::string> _lines;

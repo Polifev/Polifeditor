@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iterator>
 
-TextFile::TextFile(std::string filename) : _filename{filename} 
+TextFile::TextFile() : _filename{""} 
 {
 	_lines.push_back("");
 }
@@ -80,4 +80,12 @@ void TextFile::removeLine(int index){
 
 std::string TextFile::getLine(int index){
 	return _lines[index];
+}
+
+void TextFile::filename(std::string filename){
+	_filename = filename;
+}
+
+std::string TextFile::filename(){
+	return _filename;
 }

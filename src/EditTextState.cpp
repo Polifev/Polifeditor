@@ -6,6 +6,7 @@
 #define CTRL_KEY(key) ((key) & 0x1f)
 
 AppState EditTextState::processInput(AppContext& context){
+	char buffer[256];
 	context.editor()->renderFile();
 	context.editor()->refresh();
 	std::string str = context.keyboard()->readMultibyteChar();
@@ -27,6 +28,10 @@ AppState EditTextState::processInput(AppContext& context){
 					break;
 				case CTRL_KEY('o'):
 					nextState = APPSTATE_SAVE;
+					break;
+				case CTRL_KEY('l'):
+					sprintf(buffer, "[Lin. %d; Col. %d]", context.editor()->getLineIndex(), context.editor()->getCharIndex());
+					context.console()->display(buffer);
 					break;
 				case NEW_LINE:
 					context.editor()->insertNewLine();

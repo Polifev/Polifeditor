@@ -26,5 +26,8 @@ include_directories(src/includes)
 # build executable
 add_executable(Polifeditor ${SRC} ${INCLUDES})
 
+# Use C++17
+target_compile_features(Polifeditor PUBLIC cxx_std_17)
+
 # link libraries
 target_link_libraries(Polifeditor ${CURSES_LIBRARIES})
