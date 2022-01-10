@@ -13,13 +13,6 @@ void Editor::refresh(){
 	wrefresh(_mainWindow);
 }
 
-void Editor::renderRow(int row){
-	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
-	wmove(_mainWindow, row, 0);
-	wclrtoeol(_mainWindow);
-	waddstr(_mainWindow, _currentFile->getLine(lineIndex).c_str());
-}
-
 void Editor::renderFile() {
 	int tempX = getcurx(_mainWindow);
 	int tempY = getcury(_mainWindow);
@@ -204,15 +197,11 @@ void Editor::indent(){
 	moveTo(row, col + tabCount);
 }
 
-std::string Editor::readMultibyteChar(){
-	int i = 0;
-	char buffer[256];
-	buffer[i++] = wgetch(_mainWindow);
-	wtimeout(_mainWindow, 0);
-	while((buffer[i++] = wgetch(_mainWindow)) != -1);
-	buffer[i-1] = '\0';
-	wtimeout(_mainWindow, -1);
-	return std::string(buffer);
+void Editor::renderRow(int row){
+	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
+	wmove(_mainWindow, row, 0);
+	wclrtoeol(_mainWindow);
+	waddstr(_mainWindow, _currentFile->getLine(lineIndex).c_str());
 }
 
 void Editor::setFile(TextFile* file){

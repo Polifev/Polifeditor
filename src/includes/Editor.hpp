@@ -31,8 +31,6 @@ class Editor {
 		void eraseForward();
 		void indent();
 
-		std::string readMultibyteChar();
-
 		void setFile(TextFile* file);
 
 	private:

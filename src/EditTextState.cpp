@@ -8,12 +8,12 @@
 AppState EditTextState::processInput(AppContext& context){
 	context.editor()->renderFile();
 	context.editor()->refresh();
-	std::string str = context.editor()->readMultibyteChar();
+	std::string str = context.keyboard()->readMultibyteChar();
 	
-	//context.console()->show(str);
+	//context.console()->display(str);
 	//char buff[256];
 	//sprintf(buff, "[%d]", str[0]);
-	//context.console()->show(buff);
+	//context.console()->display(buff);
 
 	AppState nextState = APPSTATE_EDIT;
 
@@ -67,7 +67,7 @@ AppState EditTextState::processInput(AppContext& context){
 		} else if (str == "[1;5F") { // Ctrl+END
 			context.editor()->moveToEndOfFile();
 		} else {
-			context.console()->show(str);
+			context.console()->display(str);
 		}
 	}
 	return nextState;

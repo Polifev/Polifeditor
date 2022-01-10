@@ -2,28 +2,21 @@
 
 Console::Console(WINDOW* consoleWindow) : _consoleWindow { consoleWindow } {}
 
-void Console::show(const std::string& message){
-	wmove(_consoleWindow, 0, 0);
-	waddstr(_consoleWindow, message.c_str());
-	wclrtoeol(_consoleWindow);
+void Console::display(const std::string& message){
+	clear();
+	append(message);
 	wrefresh(_consoleWindow);
 }
 
-std::string Console::readLine(std::string message, std::string placeholder){
+void Console::append(const std::string& message){
+	wmove(_consoleWindow, 0, _cursorPos);
+	waddstr(_consoleWindow, message.c_str());
+	_cursorPos += message.length();
+	wrefresh(_consoleWindow);
+}
+
+void Console::clear(){
 	wmove(_consoleWindow, 0, 0);
 	wclrtoeol(_consoleWindow);
-	waddstr(_consoleWindow, message.c_str());
-	waddstr(_consoleWindow, placeholder.c_str());
-
-	char c = wgetch(_consoleWindow);
-	if(c == '\n'){
-		return placeholder;
-	} else {
-		ungetch(c);
-		char buffer[256];
-		echo();
-		wgetnstr(_consoleWindow, buffer, 255);
-		noecho();
-		return std::string(buffer);
-	}
+	_cursorPos = 0;
 }

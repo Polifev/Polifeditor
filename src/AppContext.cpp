@@ -16,9 +16,12 @@ AppContext::AppContext(){
 	_editor->refresh();
 
 	_console = new Console(_consoleWindow);
+
+	_keyboard = new Keyboard();
 }
 
 void AppContext::dispose(){
+	delete _keyboard;
 	delete _editor;
 	delete _console;
 	delete _openedFile;
@@ -31,6 +34,10 @@ Editor* AppContext::editor(){
 
 Console* AppContext::console(){
 	return _console;
+}
+
+Keyboard* AppContext::keyboard(){
+	return _keyboard;
 }
 
 void AppContext::saveFile() {

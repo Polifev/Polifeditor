@@ -12,6 +12,8 @@ set(SRC
 	src/Console.cpp
 	src/Editor.cpp
 	src/EditTextState.cpp
+	src/FileBrowser.cpp
+	src/Keyboard.cpp
 	src/SaveState.cpp
 	src/ScrollingWindow.cpp
 	src/TextFile.cpp

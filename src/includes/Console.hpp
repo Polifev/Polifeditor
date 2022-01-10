@@ -6,9 +6,11 @@
 class Console {
 	public:
 		Console(WINDOW* consoleWindow);
-		void show(const std::string& message);
-		std::string readLine(std::string message, std::string placeholder);
+		void display(const std::string& message);
+		void append(const std::string& message);
+		void clear();
 
 	private:
 		WINDOW* _consoleWindow;
+		int _cursorPos = 0;
 };
