@@ -22,8 +22,8 @@ class Editor {
 		void moveToEndOfFile();
 		void moveToStartOfLine();
 		void moveToEndOfLine();
-
-		void moveTo(int row, int col);
+		void moveToLine(int lineIndex);
+		void moveToChar(int lineIndex, int charIndex);
 
 		void insertChar(char c);
 		void insertNewLine();
@@ -38,12 +38,12 @@ class Editor {
 
 	private:
 		void renderRow(int index);
-		int trueLength(std::string line);
-		int trueLength(std::string line, int charCount);
-		int charIndex(std::string line, int cursor);
 
 		WINDOW* _mainWindow = 0;
 		TextFile* _currentFile = nullptr;
+
+		int _lineIndex = 0;
+		int _charIndex = 0;
 
 		ScrollingWindow _verticalScroll;
 		ScrollingWindow _horizontalScroll;

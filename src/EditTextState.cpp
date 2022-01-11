@@ -40,7 +40,7 @@ AppState EditTextState::processInput(AppContext& context){
 					context.editor()->eraseBackward();
 					break;
 				case '\t':
-					context.editor()->indent();
+					context.editor()->insertChar('\t');
 					break;
 				default :
 					break;

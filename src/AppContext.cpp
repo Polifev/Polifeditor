@@ -12,7 +12,7 @@ AppContext::AppContext(){
 	_editor = new Editor(_mainWindow);
 	_editor->setFile(_openedFile);
 	_editor->renderFile();
-	_editor->moveTo(0, 0);
+	_editor->moveToChar(0, 0);
 	_editor->refresh();
 
 	_console = new Console(_consoleWindow);
