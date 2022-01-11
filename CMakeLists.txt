@@ -30,4 +30,4 @@ add_executable(Polifeditor ${SRC} ${INCLUDES})
 target_compile_features(Polifeditor PUBLIC cxx_std_17)
 
 # link libraries
-target_link_libraries(Polifeditor ${CURSES_LIBRARIES})
+target_link_libraries(Polifeditor ${CURSES_LIBRARIES} stdc++fs)

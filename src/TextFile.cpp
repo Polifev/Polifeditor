@@ -8,14 +8,18 @@
 #include <iostream>
 #include <iterator>
 
-TextFile::TextFile() : _filename{""} 
+TextFile::TextFile() : _filename{""}
 {
 	_lines.push_back("");
 }
 
+bool TextFile::readyToRead() {
+	// TODO: Check that file exists
+	return true;
+}
+
 void TextFile::read(){
 	_lines.clear();
-	
 	std::ifstream inFile;
 
 	inFile.open(_filename);
@@ -37,6 +41,11 @@ void TextFile::read(){
 		_lines.push_back(line);
 	}
 	inFile.close();
+}
+
+bool TextFile::readyToWrite(){
+	// TODO : check path
+	return true;
 }
 
 void TextFile::write() {

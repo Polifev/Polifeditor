@@ -10,7 +10,7 @@ AppState EditTextState::processInput(AppContext& context){
 	context.editor()->renderFile();
 	context.editor()->refresh();
 	std::string str = context.keyboard()->readMultibyteChar();
-	
+
 	//context.console()->display(str);
 	//char buff[256];
 	//sprintf(buff, "[%d]", str[0]);

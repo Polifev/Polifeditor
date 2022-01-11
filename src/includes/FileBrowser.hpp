@@ -1,7 +1,8 @@
 #pragma once
+#include "filesystem.hpp"
+
 #include <string>
 #include <vector>
-#include <filesystem>
 
 class FileBrowser {
 	public:
@@ -10,7 +11,6 @@ class FileBrowser {
 		std::string wd();
 		std::vector<std::string> ls();
 		//bool fileExists(std::string filename);
-	
 	private:
-		std::filesystem::path _wd;
+		fs::path _wd;
 };

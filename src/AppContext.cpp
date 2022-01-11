@@ -3,12 +3,12 @@
 AppContext::AppContext(){
 	initscr();
 	noecho();
+
 	_mainWindow = subwin(stdscr, LINES-1, COLS, 0, 0);
 	_consoleWindow = subwin(stdscr, 1, COLS, LINES-1, 0);
 
 	_openedFile = new TextFile();
-	//_openedFile->read();
-	
+
 	_editor = new Editor(_mainWindow);
 	_editor->setFile(_openedFile);
 	_editor->renderFile();

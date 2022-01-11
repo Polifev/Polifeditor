@@ -5,7 +5,11 @@
 App::App(int argc, char** argv) {
 	_currentState = new EditTextState();
 	if(argc > 1){
-		_context.openedFile()->filename(std::string(argv[1]));
+		TextFile* file = _context.openedFile();
+		file->filename(std::string(argv[1]));
+		if(file->readyToRead()){
+			file->read();
+		}
 	}
 }
 
