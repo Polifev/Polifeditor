@@ -1,5 +1,6 @@
 #include "TextFile.hpp"
 
+#include "filesystem.hpp"
 #include <locale>
 #include <codecvt>
 #include <string>
@@ -14,8 +15,8 @@ TextFile::TextFile() : _filename{""}
 }
 
 bool TextFile::readyToRead() {
-	// TODO: Check that file exists
-	return true;
+	fs::path p = fs::path(_filename);
+	return fs::exists(p) && !fs::is_directory(p);
 }
 
 void TextFile::read(){
@@ -44,8 +45,8 @@ void TextFile::read(){
 }
 
 bool TextFile::readyToWrite(){
-	// TODO : check path
-	return true;
+	fs::path p = fs::path(_filename);
+	return p.has_filename();
 }
 
 void TextFile::write() {

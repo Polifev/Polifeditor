@@ -10,6 +10,8 @@ App::App(int argc, char** argv) {
 		if(file->readyToRead()){
 			file->read();
 		}
+		_context.editor()->renderFile();
+		_context.editor()->refresh();
 	}
 }
 
