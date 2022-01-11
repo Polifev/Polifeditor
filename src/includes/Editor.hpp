@@ -10,7 +10,7 @@
 class Editor {
 	public:
 		Editor(WINDOW* mainWindow);
-		
+
 		void refresh();
 		void renderFile();
 
@@ -38,6 +38,9 @@ class Editor {
 
 	private:
 		void renderRow(int index);
+		int trueLength(std::string line);
+		int trueLength(std::string line, int charCount);
+		int charIndex(std::string line, int cursor);
 
 		WINDOW* _mainWindow = 0;
 		TextFile* _currentFile = nullptr;

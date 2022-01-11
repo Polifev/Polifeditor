@@ -1,16 +1,17 @@
 #include "Editor.hpp"
 #include "Math.hpp"
 
-#define TABSTOP 4
+#define TABSTOP 8
 #define EMPTY_LINE '~'
 
-Editor::Editor(WINDOW* mainWindow): 
+
+Editor::Editor(WINDOW* mainWindow):
 _mainWindow { mainWindow },
 _verticalScroll { getmaxy(mainWindow) },
 _horizontalScroll { getmaxx(mainWindow) } {}
 
 void Editor::refresh(){
-	wrefresh(_mainWindow);
+		wrefresh(_mainWindow);
 }
 
 void Editor::renderFile() {
@@ -45,21 +46,31 @@ void Editor::moveDown(){
 
 void Editor::moveLeft(){
 	int row = getcury(_mainWindow);
-	int col = getcurx(_mainWindow) - 1;
-	if(col < 0 && row > 0){
+	int col = getcurx(_mainWindow);
+	int lineIndex = getLineIndex();
+
+	if( col > 0 ) {
+		std::string line = _currentFile->getLine(lineIndex);
+		col = trueLength(line, charIndex(line, col)-1);
+	} else if( lineIndex > 0 ){
+		std::string line = _currentFile->getLine(lineIndex - 1);
 		row--;
-		col = _currentFile->getLine(_verticalScroll.getAbsoluteIndex(row)).length();
+		col = trueLength(line);
 	}
 	moveTo(row, col);
 }
 
 void Editor::moveRight(){
 	int row = getcury(_mainWindow);
-	int col = getcurx(_mainWindow) + 1;
-	int rowLength = _currentFile->getLine(getLineIndex()).length();
-	if(col > rowLength && row < _currentFile->lineCount()){
-		col = 0;
+	int col = getcurx(_mainWindow);
+	int lineIndex = getLineIndex();
+
+	std::string line = _currentFile->getLine(lineIndex);
+	if( col < trueLength(line) ) {
+		col = trueLength(line, charIndex(line, col) + 1);
+	} else if( lineIndex < _currentFile->lineCount()-1 ) {
 		row++;
+		col = 0;
 	}
 	moveTo(row, col);
 }
@@ -82,14 +93,15 @@ void Editor::moveToStartOfLine(){
 void Editor::moveToEndOfLine(){
 	int row = getcury(_mainWindow);
 	int lineIndex = getLineIndex();
-	moveTo(row, _currentFile->getLine(lineIndex).length());
+	std::string line = _currentFile->getLine(lineIndex);
+	moveTo(row, trueLength(line));
 }
 
 void Editor::moveTo(int row, int col){
 	int maxRow = getmaxy(_mainWindow);
 	int overflow = row - maxRow + 1;
 	int underflow = 0 - row;
-	
+
 	_verticalScroll.setContentSize(_currentFile->lineCount());
 	if(overflow > 0){
 		_verticalScroll.move(overflow);
@@ -105,7 +117,7 @@ void Editor::moveTo(int row, int col){
 
 	int lineIndex = _verticalScroll.getAbsoluteIndex(row);
 	std::string str = _currentFile->getLine(lineIndex);
-	col = clamp(col, 0, str.size());
+	col = clamp(col, 0, trueLength(str, charIndex(str, col)));
 	wmove(_mainWindow, row, col);
 }
 
@@ -119,7 +131,7 @@ void Editor::insertChar(char c){
 	str.insert(charIndex, 1, c);
 	_currentFile->editLine(lineIndex, str);
 
-	moveTo(row, col+1);
+	moveRight();
 }
 
 void Editor::insertNewLine(){
@@ -135,7 +147,8 @@ void Editor::insertNewLine(){
 	_currentFile->insertLine(lineIndex);
 	_currentFile->editLine(lineIndex, firstHalf);
 	_currentFile->editLine(lineIndex+1, secondHalf);
-	moveTo(row+1, 0);
+	//moveTo(row+1, 0);
+	moveRight();
 }
 
 void Editor::eraseBackward(){
@@ -154,18 +167,19 @@ void Editor::eraseBackward(){
 
 		if(_verticalScroll.getStart() == 0){
 			_verticalScroll.setContentSize(_currentFile->lineCount());
-			moveTo(row-1, firstHalf.size());
+			//moveTo(row-1, firstHalf.size());
 		} else {
 			_verticalScroll.setContentSize(_currentFile->lineCount());
-			moveTo(row, firstHalf.size());
+			//moveTo(row, firstHalf.size());
 		}
 	} else if(charIndex > 0) {
 		// Remove character
 		std::string firstHalf = str.substr(0, charIndex-1);
 		std::string secondHalf = str.substr(charIndex);
 		_currentFile->editLine(lineIndex, firstHalf + secondHalf);
-		moveTo(row, col-1);
+		//moveTo(row, col-1);
 	}
+	moveLeft();
 }
 
 void Editor::eraseForward(){
@@ -199,11 +213,12 @@ void Editor::indent(){
 
 	std::string str = _currentFile->getLine(lineIndex);
 	int tabCount = TABSTOP - (charIndex%TABSTOP);
-	std::string tab = std::string(tabCount, ' ');
-	str.insert(charIndex, tab);
+	//std::string tab = std::string(tabCount, ' ');
+	str.insert(charIndex, 1, '\t');
 	_currentFile->editLine(lineIndex, str);
 
-	moveTo(row, col + tabCount);
+	//moveTo(row, col + 1);
+	moveRight();
 }
 
 void Editor::renderRow(int row){
@@ -218,9 +233,42 @@ int Editor::getLineIndex(){
 }
 
 int Editor::getCharIndex(){
-	return getcurx(_mainWindow);
+	// TODO: handle horizontal scrolling
+	int lineIndex = getLineIndex();
+	int cursor = getcurx(_mainWindow);
+	std::string line = _currentFile->getLine(lineIndex);
+	return charIndex(line, cursor);
 }
 
 void Editor::setFile(TextFile* file){
 	_currentFile = file;
+}
+
+int Editor::charIndex(std::string line, int col) {
+	int i;
+	int length = 0;
+	for(i = 0; i < line.length() && length < col; i++) {
+		if(line[i] == '\t') {
+			length += TABSTOP - (length % TABSTOP);
+		} else {
+			length++;
+		}
+	}
+	return i;
+}
+
+int Editor::trueLength(std::string line) {
+	return trueLength(line, line.length());
+}
+
+int Editor::trueLength(std::string line, int charCount) {
+	int length = 0;
+	for(int i = 0; i < line.length() && i < charCount; i++) {
+		if(line[i] == '\t') {
+			length += TABSTOP - (length % TABSTOP);
+		} else {
+			length++;
+		}
+	}
+	return length;
 }
