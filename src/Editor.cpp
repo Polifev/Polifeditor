@@ -6,8 +6,9 @@
 
 Editor::Editor(WINDOW* mainWindow):
 _mainWindow { mainWindow },
-_verticalScroll { getmaxy(mainWindow) },
-_horizontalScroll { getmaxx(mainWindow) } {}
+_verticalScroll { getmaxy(mainWindow) }
+//_horizontalScroll { getmaxx(mainWindow) }
+{}
 
 void Editor::refresh(){
 	wrefresh(_mainWindow);
@@ -61,7 +62,7 @@ void Editor::moveToLine(int lineIndex){
 	_lineIndex = lineIndex;
 	// Handle scrolling
 	int firstLineShown = _verticalScroll.getStart();
-	int lastLineShown = _verticalScroll.getEnd();
+	int lastLineShown = _verticalScroll.getEnd() - 1;
 	if(_lineIndex < firstLineShown){
 		_verticalScroll.move(_lineIndex - firstLineShown);
 	} else if(_lineIndex > lastLineShown) {
@@ -74,6 +75,8 @@ void Editor::moveToLine(int lineIndex){
 }
 
 void Editor::moveToChar(int lineIndex, int charIndex){
+	_verticalScroll.setContentSize(_currentFile->lineCount());
+
 	moveToLine(lineIndex);
 
 	// We need the line string for the col computation
@@ -88,14 +91,15 @@ void Editor::moveToChar(int lineIndex, int charIndex){
 		}
 	}
 
-	wmove(_mainWindow, getcury(_mainWindow), col);	
+	wmove(_mainWindow, getcury(_mainWindow), col);
 }
 
 void Editor::insertChar(char c){
 	std::string line = _currentFile->getLine(_lineIndex);
 	line.insert(_charIndex, 1, c);
 	_currentFile->editLine(_lineIndex, line);
-	moveToChar(_lineIndex, _charIndex + 1);
+	moveRight();
+	//moveToChar(_lineIndex, _charIndex + 1);
 }
 
 void Editor::insertNewLine(){
@@ -107,7 +111,8 @@ void Editor::insertNewLine(){
 	_currentFile->insertLine(_lineIndex);
 	_currentFile->editLine(_lineIndex, firstHalf);
 	_currentFile->editLine(_lineIndex+1, secondHalf);
-	moveToChar(_lineIndex + 1, 0);
+	moveDown();
+	moveToStartOfLine();
 }
 
 void Editor::eraseBackward(){
@@ -118,13 +123,12 @@ void Editor::eraseBackward(){
 		std::string previousLine = _currentFile->getLine(_lineIndex - 1);
 		_currentFile->editLine(_lineIndex - 1, previousLine + line);
 		_currentFile->removeLine(_lineIndex);
-		_verticalScroll.setContentSize(_currentFile->lineCount());
 		moveToChar(_lineIndex - 1, previousLine.length());
 	} else if(_charIndex > 0) {
 		// Remove character
 		line.erase(_charIndex-1, 1);
 		_currentFile->editLine(_lineIndex, line);
-		moveToChar(_lineIndex, _charIndex - 1);
+		moveLeft();
 	}
 }
 
@@ -136,12 +140,12 @@ void Editor::eraseForward(){
 		std::string nextLine = _currentFile->getLine(_lineIndex+1);
 		_currentFile->editLine(_lineIndex, line + nextLine);
 		_currentFile->removeLine(_lineIndex+1);
-		_verticalScroll.setContentSize(_currentFile->lineCount());
 	} else {
 		// Remove character
 		line.erase(_charIndex, 1);
 		_currentFile->editLine(_lineIndex, line);
 	}
+	moveToChar(_lineIndex, _charIndex);
 }
 
 void Editor::renderRow(int row){

@@ -46,5 +46,5 @@ class Editor {
 		int _charIndex = 0;
 
 		ScrollingWindow _verticalScroll;
-		ScrollingWindow _horizontalScroll;
+		//ScrollingWindow _horizontalScroll;
 };
