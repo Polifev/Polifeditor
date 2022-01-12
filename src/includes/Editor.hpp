@@ -29,13 +29,12 @@ class Editor {
 		void insertNewLine();
 		void eraseBackward();
 		void eraseForward();
-		void indent();
 
 		int getCharIndex();
 		int getLineIndex();
 
 		void setFile(TextFile* file);
-
+		
 	private:
 		void renderRow(int index);
 
