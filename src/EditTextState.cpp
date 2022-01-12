@@ -75,7 +75,7 @@ AppState EditTextState::processInput(AppContext& context){
 			context.console()->display(str);
 		}
 	}
-	context.editor()->renderFile();
-	context.editor()->refresh();
+	//context.editor()->renderFile();
+	//context.editor()->refresh();
 	return nextState;
 }

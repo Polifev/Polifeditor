@@ -23,19 +23,32 @@ void Editor::renderFile() {
 }
 
 void Editor::moveUp(){
+	// TODO handle this better (indentation)
 	moveToChar(_lineIndex - 1, _charIndex);
 }
 
 void Editor::moveDown(){
+	// TODO handle this better (indentation)
 	moveToChar(_lineIndex+1, _charIndex);
 }
 
 void Editor::moveLeft(){
-	moveToChar(_lineIndex, _charIndex-1);
+	if(_charIndex == 0 && _lineIndex > 0){
+		moveToLine(_lineIndex - 1);
+		moveToEndOfLine();
+	} else {
+		moveToChar(_lineIndex, _charIndex-1);
+	}
 }
 
 void Editor::moveRight(){
-	moveToChar(_lineIndex, _charIndex+1);
+	std::string line = _currentFile->getLine(_lineIndex);
+	if(_charIndex == line.length() && _lineIndex < _currentFile->lineCount()){
+		moveToLine(_lineIndex + 1);
+		moveToStartOfLine();
+	} else {
+		moveToChar(_lineIndex, _charIndex+1);
+	}
 }
 
 void Editor::moveToStartOfFile(){
@@ -58,6 +71,8 @@ void Editor::moveToEndOfLine(){
 }
 
 void Editor::moveToLine(int lineIndex){
+	_verticalScroll.setContentSize(_currentFile->lineCount());
+
 	lineIndex = clamp(lineIndex, 0, _currentFile->lineCount() - 1);
 	_lineIndex = lineIndex;
 	// Handle scrolling
@@ -75,8 +90,6 @@ void Editor::moveToLine(int lineIndex){
 }
 
 void Editor::moveToChar(int lineIndex, int charIndex){
-	_verticalScroll.setContentSize(_currentFile->lineCount());
-
 	moveToLine(lineIndex);
 
 	// We need the line string for the col computation
