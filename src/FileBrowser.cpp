@@ -2,10 +2,11 @@
 
 
 FileBrowser::FileBrowser() : _wd{"./"} {
+	_wd = fs::canonical(_wd);
 }
 
 void FileBrowser::cd(std::string path){
-	_wd = _wd / fs::path(path);
+	_wd = fs::canonical(_wd / fs::path(path));
 }
 
 std::string FileBrowser::wd(){
