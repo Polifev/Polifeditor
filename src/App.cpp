@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "EditTextState.hpp"
 #include "SaveState.hpp"
+#include "CommandState.hpp"
 
 App::App(int argc, char** argv) {
 	_currentState = new EditTextState();
@@ -26,7 +27,7 @@ int App::run(){
 			transitionTo(state);
 		}
 	}
-
+	delete _currentState;
 	_context.dispose();
 	return 0;
 }
@@ -40,6 +41,10 @@ void App::transitionTo(AppState state){
 		break;
 	case APPSTATE_SAVE:
 		_currentState = new SaveState();
+		break;
+	case APPSTATE_COMMAND:
+		_currentState = new CommandState();
+		break;
 	default:
 		break;
 	}

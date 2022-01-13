@@ -29,6 +29,9 @@ AppState EditTextState::processInput(AppContext& context){
 				case CTRL_KEY('o'):
 					nextState = APPSTATE_SAVE;
 					break;
+				case CTRL_KEY('k'):
+					nextState = APPSTATE_COMMAND;
+					break;
 				case CTRL_KEY('l'):
 					sprintf(buffer, "[Lin. %d; Col. %d]", context.editor()->getLineIndex(), context.editor()->getCharIndex());
 					context.console()->display(buffer);
