@@ -7,14 +7,18 @@ Find_package(Curses)
 
 # every source file
 set(SRC
+	src/AbstractCommand.cpp
 	src/App.cpp
 	src/AppContext.cpp
+	src/CommandLibrary.cpp
 	src/CommandState.cpp
 	src/Console.cpp
 	src/Editor.cpp
 	src/EditTextState.cpp
 	src/FileBrowser.cpp
+	src/HelloCommand.cpp
 	src/Keyboard.cpp
+	src/PwdCommand.cpp
 	src/SaveState.cpp
 	src/ScrollingWindow.cpp
 	src/TextFile.cpp

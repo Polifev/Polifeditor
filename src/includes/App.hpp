@@ -1,5 +1,7 @@
 #pragma once
-#include "IState.hpp"
+#include "EditTextState.hpp"
+#include "SaveState.hpp"
+#include "CommandState.hpp"
 
 class App {
 	public:
@@ -9,5 +11,9 @@ class App {
 		AppContext _context;
 		IState* _currentState;
 		
+		EditTextState _editState;
+		SaveState _saveState;
+		CommandState _commandState;
+
 		void transitionTo(AppState state);
 };

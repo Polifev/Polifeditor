@@ -19,4 +19,5 @@ void Console::clear(){
 	wmove(_consoleWindow, 0, 0);
 	wclrtoeol(_consoleWindow);
 	_cursorPos = 0;
+	wrefresh(_consoleWindow);
 }

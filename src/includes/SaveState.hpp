@@ -1,3 +1,4 @@
+#pragma once
 #include "IState.hpp"
 
 class SaveState : public IState {

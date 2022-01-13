@@ -54,3 +54,11 @@ TextFile* AppContext::openedFile(){
 void AppContext::saveFile() {
 	_openedFile->write();
 }
+
+std::string AppContext::command() {
+	return _command;
+}
+
+void AppContext::command(std::string command) {
+	_command = command;
+}

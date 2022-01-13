@@ -15,6 +15,9 @@ class AppContext {
 		FileBrowser* fileBrowser();
 		TextFile* openedFile();
 
+		std::string command();
+		void command(std::string command);
+
 		void saveFile();
 	private:
 		WINDOW* _mainWindow;
@@ -25,4 +28,5 @@ class AppContext {
 		Console* _console;
 		FileBrowser* _fileBrowser;
 		TextFile* _openedFile; // TODO: replace with multiple files manager
+		std::string _command;
 };

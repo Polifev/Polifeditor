@@ -4,7 +4,7 @@
 #include "CommandState.hpp"
 
 App::App(int argc, char** argv) {
-	_currentState = new EditTextState();
+	_currentState = &_editState;
 	if(argc > 1){
 		TextFile* file = _context.openedFile();
 		file->filename(std::string(argv[1]));
@@ -27,23 +27,21 @@ int App::run(){
 			transitionTo(state);
 		}
 	}
-	delete _currentState;
 	_context.dispose();
 	return 0;
 }
 
 void App::transitionTo(AppState state){
-	delete _currentState;
 	switch (state)
 	{
 	case APPSTATE_EDIT:
-		_currentState = new EditTextState();
+		_currentState = &_editState;
 		break;
 	case APPSTATE_SAVE:
-		_currentState = new SaveState();
+		_currentState = &_saveState;
 		break;
 	case APPSTATE_COMMAND:
-		_currentState = new CommandState();
+		_currentState = &_commandState;
 		break;
 	default:
 		break;
